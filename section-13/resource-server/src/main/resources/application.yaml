@@ -1,0 +1,20 @@
+spring:
+  security:
+    user:
+      name: DEVUSER
+      password: 123456
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8080/auth/realms/security-app-dev/protocol/openid-connect/certs
+  datasource:
+    url: jdbc:mysql://${DB_HOSTNAME:localhost}:${DB_PORT:3306}/${DB_NAME:db-users}?serverTimezone=UTC
+    username: ${DB_USERNAME:DEVUSER}
+    password: ${DB_PASSWORD:DEVPASSWORD22}
+
+logging:
+  level:
+    org.springframework.security.web.FilterChainProxy: DEBUG
+
+server:
+  port: 8081
