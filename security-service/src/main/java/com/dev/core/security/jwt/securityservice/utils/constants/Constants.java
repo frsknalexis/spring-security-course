@@ -14,8 +14,11 @@ public class Constants {
 
   public static final String COMMA_DELIMITER;
 
+  public static final String USERNAME;
+
   static {
     EMPTY_VALUE = "";
     COMMA_DELIMITER = ",";
+    USERNAME = "username";
   }
 }

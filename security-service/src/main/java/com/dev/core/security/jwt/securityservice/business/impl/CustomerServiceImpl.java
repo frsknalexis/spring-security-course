@@ -1,13 +1,17 @@
 package com.dev.core.security.jwt.securityservice.business.impl;
 
 import static com.dev.core.security.jwt.securityservice.security.utils.SecurityUtils.getCurrentUsername;
+import static com.dev.core.security.jwt.securityservice.utils.constants.Constants.USERNAME;
 
 import com.dev.core.security.jwt.securityservice.business.CustomerService;
 import com.dev.core.security.jwt.securityservice.business.processor.CustomerProcessor;
 import com.dev.core.security.jwt.securityservice.model.api.response.CustomerResponse;
 import com.dev.core.security.jwt.securityservice.repository.CustomerRepository;
 import com.dev.core.security.jwt.securityservice.security.model.SecurityCustomer;
+import java.util.Map;
 import java.util.Optional;
+
+import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -39,10 +43,11 @@ public class CustomerServiceImpl implements CustomerService {
   }
 
   @Override
-  public CustomerResponse findCustomerByEmail() throws Exception {
+  public CustomerResponse findCustomerByEmail() {
     return Optional.ofNullable(customerRepository.findByEmail(getCurrentUsername()))
             .map(customerProcessor::buildCustomerResponse)
             .orElseThrow(() ->
-                    new Exception("Customer details not found for the specified email"));
+                    new com.dev.core.security.jwt.securityservice.exception
+                            .UsernameNotFoundException(ImmutableMap.of(USERNAME, getCurrentUsername())));
   }
 }
