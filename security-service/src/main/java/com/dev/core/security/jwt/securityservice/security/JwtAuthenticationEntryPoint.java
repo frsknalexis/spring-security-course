@@ -3,9 +3,13 @@ package com.dev.core.security.jwt.securityservice.security;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 /**
  * Some javadoc.
@@ -14,7 +18,15 @@ import org.springframework.stereotype.Component;
  * @version 0.0.1
  */
 @Component
+@Slf4j
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+  private final HandlerExceptionResolver handlerExceptionResolver;
+
+  public JwtAuthenticationEntryPoint(@Autowired @Qualifier("handlerExceptionResolver")
+                                     HandlerExceptionResolver handlerExceptionResolver) {
+    this.handlerExceptionResolver = handlerExceptionResolver;
+  }
 
   /**
    * This is invoked when user tries to access a secured REST resource
@@ -30,6 +42,14 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
   public void commence(HttpServletRequest request,
       HttpServletResponse response,
       AuthenticationException authException) throws IOException {
-    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
+    log.error("User is unauthorised. Routing from the entry point");
+
+    if (request.getAttribute("javax.servlet.error.exception") != null) {
+      Throwable throwable = (Throwable) request.getAttribute("javax.servlet.error.exception");
+      handlerExceptionResolver.resolveException(request, response, null, (Exception) throwable);
+    }
+    if (!response.isCommitted()) {
+      response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
+    }
   }
 }

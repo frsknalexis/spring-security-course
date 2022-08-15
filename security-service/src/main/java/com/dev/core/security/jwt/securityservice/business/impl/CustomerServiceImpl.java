@@ -8,10 +8,8 @@ import com.dev.core.security.jwt.securityservice.business.processor.CustomerProc
 import com.dev.core.security.jwt.securityservice.model.api.response.CustomerResponse;
 import com.dev.core.security.jwt.securityservice.repository.CustomerRepository;
 import com.dev.core.security.jwt.securityservice.security.model.SecurityCustomer;
-import java.util.Map;
-import java.util.Optional;
-
 import com.google.common.collect.ImmutableMap;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -48,6 +46,7 @@ public class CustomerServiceImpl implements CustomerService {
             .map(customerProcessor::buildCustomerResponse)
             .orElseThrow(() ->
                     new com.dev.core.security.jwt.securityservice.exception
-                            .UsernameNotFoundException(ImmutableMap.of(USERNAME, getCurrentUsername())));
+                            .UsernameNotFoundException(ImmutableMap.of(USERNAME,
+                            getCurrentUsername())));
   }
 }

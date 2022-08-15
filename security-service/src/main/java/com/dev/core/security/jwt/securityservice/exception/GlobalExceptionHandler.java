@@ -92,4 +92,20 @@ public class GlobalExceptionHandler {
     log.info("occurred UserNotFoundException: " + errorResponse);
     return ResponseEntity.status(ex.getErrorCode().getHttpStatus()).body(errorResponse);
   }
+
+
+  /**
+   * Method that handle InvalidJwtException.
+   *
+   * @param ex InvalidJwtException.
+   * @param request HttpServletRequest.
+   * @return ResponseEntity&lt;ErrorResponse&gt; ErrorResponse.
+   */
+  @ExceptionHandler(value = InvalidJwtException.class)
+  public ResponseEntity<ErrorResponse> handleInvalidJwtException(InvalidJwtException ex,
+      HttpServletRequest request) {
+    var errorResponse = new ErrorResponse(ex, request.getRequestURI());
+    log.info("occurred InvalidJwtException: " + errorResponse);
+    return ResponseEntity.status(ex.getErrorCode().getHttpStatus()).body(errorResponse);
+  }
 }

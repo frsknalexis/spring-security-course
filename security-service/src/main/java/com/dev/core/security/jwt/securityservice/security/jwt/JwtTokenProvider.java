@@ -1,13 +1,16 @@
 package com.dev.core.security.jwt.securityservice.security.jwt;
 
+import static com.dev.core.security.jwt.securityservice.exception.ErrorCode.VERIFY_JWT_FAILED;
 import static com.dev.core.security.jwt.securityservice.security.utils.SecurityConstants.AUTHORITIES_KEY;
 import static com.dev.core.security.jwt.securityservice.security.utils.SecurityConstants.USER_KEY;
 import static com.dev.core.security.jwt.securityservice.utils.constants.Constants.COMMA_DELIMITER;
+import static com.dev.core.security.jwt.securityservice.utils.constants.Constants.DETAIL;
 import static com.dev.core.security.jwt.securityservice.utils.constants.Constants.EMPTY_VALUE;
-import static java.lang.Boolean.FALSE;
+import static com.dev.core.security.jwt.securityservice.utils.constants.Constants.ERROR_MESSAGE;
 import static java.lang.Boolean.TRUE;
 
 import com.dev.core.security.jwt.securityservice.config.ApplicationProperties;
+import com.dev.core.security.jwt.securityservice.exception.InvalidJwtException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -19,6 +22,7 @@ import io.jsonwebtoken.security.SecurityException;
 import java.security.Key;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -130,17 +134,25 @@ public class JwtTokenProvider implements InitializingBean {
       return TRUE;
     } catch (SecurityException | MalformedJwtException e) {
       log.info("Invalid JWT signature.");
-      log.info("Invalid JWT signature trace: {}", e);
+      log.info("Invalid JWT signature trace: {}", e.toString());
+      throw new InvalidJwtException(VERIFY_JWT_FAILED,
+              Map.of(ERROR_MESSAGE, "Invalid JWT signature.", DETAIL, e.getMessage()));
     } catch (ExpiredJwtException e) {
       log.info("Expired JWT token.");
-      log.info("Expired JWT token trace: {}", e);
+      log.info("Expired JWT token trace: {}", e.toString());
+      throw new InvalidJwtException(VERIFY_JWT_FAILED,
+              Map.of(ERROR_MESSAGE, "Expired JWT token.", DETAIL, e.getMessage()));
     } catch (UnsupportedJwtException e) {
       log.info("Unsupported JWT token.");
-      log.info("Unsupported JWT token trace: {}", e);
+      log.info("Unsupported JWT token trace: {}", e.toString());
+      throw new InvalidJwtException(VERIFY_JWT_FAILED,
+              Map.of(ERROR_MESSAGE, "Unsupported JWT token.", DETAIL, e.getMessage()));
     } catch (IllegalArgumentException e) {
       log.info("JWT token compact of handler are invalid.");
-      log.info("JWT token compact of handler are invalid trace: {}", e);
+      log.info("JWT token compact of handler are invalid trace: {}", e.toString());
+      throw new InvalidJwtException(VERIFY_JWT_FAILED,
+              Map.of(ERROR_MESSAGE, "JWT token compact of handler are invalid.",
+                      DETAIL, e.getMessage()));
     }
-    return FALSE;
   }
 }
