@@ -7,6 +7,7 @@ import static com.dev.core.security.jwt.securityservice.utils.constants.Constant
 import static com.dev.core.security.jwt.securityservice.utils.constants.Constants.DETAIL;
 import static com.dev.core.security.jwt.securityservice.utils.constants.Constants.EMPTY_VALUE;
 import static com.dev.core.security.jwt.securityservice.utils.constants.Constants.ERROR_MESSAGE;
+import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
 import com.dev.core.security.jwt.securityservice.config.ApplicationProperties;
@@ -25,6 +26,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -132,11 +135,16 @@ public class JwtTokenProvider implements InitializingBean {
               .build()
               .parseClaimsJws(token);
       return TRUE;
-    } catch (SecurityException | MalformedJwtException e) {
+    } catch (SignatureException e) {
       log.info("Invalid JWT signature.");
       log.info("Invalid JWT signature trace: {}", e.toString());
       throw new InvalidJwtException(VERIFY_JWT_FAILED,
               Map.of(ERROR_MESSAGE, "Invalid JWT signature.", DETAIL, e.getMessage()));
+    } catch (MalformedJwtException e) {
+      log.info("Invalid JWT token.");
+      log.info("Invalid JWT token trace: {}", e.toString());
+      throw new InvalidJwtException(VERIFY_JWT_FAILED,
+              Map.of(ERROR_MESSAGE, "Invalid JWT token.", DETAIL, e.getMessage()));
     } catch (ExpiredJwtException e) {
       log.info("Expired JWT token.");
       log.info("Expired JWT token trace: {}", e.toString());
